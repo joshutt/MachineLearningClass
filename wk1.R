@@ -1,23 +1,30 @@
 
-pla <- function(N=10, graph=FALSE, gfail=FALSE, hideReal=FALSE) {
-    pts <- matrix(c(rep(1,N), runif(2*N, -1, 1)), ncol=3)
-    lnPt <- matrix(runif(4, -1, 1), ncol=2)
-    w <- as.numeric(vector(length=3))
+pla <- function(N=10, graph=FALSE, gfail=FALSE, hideReal=FALSE, movingLine=FALSE, w=NULL, pts=NULL, eq=NULL) {
+    if (is.null(pts)) {
+        pts <- matrix(c(rep(1,N), runif(2*N, -1, 1)), ncol=3)
+    }
+    if (is.null(w)) {
+        w <- as.numeric(vector(length=3))
+    }
 
-    m <- matrix(c(rep(1,2), lnPt[,1]), ncol=2)
-    eq <- solve(m, lnPt[,2])
+    if (is.null(eq)) {
+        lnPt <- matrix(runif(4, -1, 1), ncol=2)
+        m <- matrix(c(rep(1,2), lnPt[,1]), ncol=2)
+        eq <- solve(m, lnPt[,2])
+    }
     y <- sign(pts[,2] * eq[2] + eq[1] - pts[,3])
 
     count <- 0
 
 
     while (sum(sign(colSums(t(pts)*w)) != y) > 0){
-    if (graph) {
-        plot(pts[,2], pts[,3], xlim=c(-1,1), ylim=c(-1,1))
-        if (!hideReal) {
-            abline(eq, lwd=3, col="red")
+        if (graph) {
+            plot(pts[,2], pts[,3], xlim=c(-1,1), ylim=c(-1,1))
+            if (!hideReal) {
+                abline(eq, lwd=3, col="red")
+            }
         }
-    }
+
         count <- count+1
         vals <- sample(nrow(pts))
         #print(count) 
@@ -31,7 +38,7 @@ pla <- function(N=10, graph=FALSE, gfail=FALSE, hideReal=FALSE) {
             break
         }
 
-        if (graph) {
+        if (graph | movingLine) {
             abline(-w[1]/w[3], -w[2]/w[3], col="blue")
             Sys.sleep(1)
         }
